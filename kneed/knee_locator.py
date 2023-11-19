@@ -34,7 +34,7 @@ class KneeLocator(object):
     :type curve: str
     :param direction: one of {"increasing", "decreasing"}
     :type direction: str
-    :param interp_method: one of {"interp1d", "polynomial"}
+    :param interp_method: one of {"interp1d", "polynomial", "piecewise"}
     :type interp_method: str
     :param online: kneed will correct old knee points if True, will return first knee if False
     :type online: bool
@@ -51,7 +51,7 @@ class KneeLocator(object):
     :vartype curve: str
     :ivar direction: one of {"increasing", "decreasing"}
     :vartype direction: str
-    :ivar interp_method: one of {"interp1d", "polynomial"}
+    :ivar interp_method: one of {"interp1d", "polynomial", "piecewise"}
     :vartype interp_method: str
     :ivar online: kneed will correct old knee points if True, will return first knee if False
     :vartype online: str
@@ -181,7 +181,7 @@ class KneeLocator(object):
             self.Ds_y = p(x)
         else:
             raise ValueError(
-                "{} is an invalid interp_method parameter, use either 'interp1d' or 'polynomial'".format(
+                "{} is an invalid interp_method parameter, use either 'interp1d', 'polynomial', or 'piecewise'".format(
                     interp_method
                 )
             )
