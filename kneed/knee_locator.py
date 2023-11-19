@@ -40,6 +40,8 @@ class KneeLocator(object):
     :type online: bool
     :param polynomial_degree: The degree of the fitting polynomial. Only used when interp_method="polynomial". This argument is passed to numpy polyfit `deg` parameter.
     :type polynomial_degree: int
+    :param piecewise_params: Initial inflection point x0, y0 and a slope m. Only used when interp_method="piecewise". The default is [0.5, 0, 1.0].
+    :type piecewise_params: Tuple[float, float, float]
     :ivar x: x values.
     :vartype x: array-like
     :ivar y: y values.
@@ -57,6 +59,8 @@ class KneeLocator(object):
     :vartype online: str
     :ivar polynomial_degree: The degree of the fitting polynomial. Only used when interp_method="polynomial". This argument is passed to numpy polyfit `deg` parameter.
     :vartype polynomial_degree: int
+    :ivar piecewise_params: Initial inflection point x0, y0 and a slope m. Only used when interp_method="piecewise". The default is [0.5, 0, 1.0].
+    :vartype piecewise_params: Tuple[float, float, float]
     :ivar N: The number of `x` values in the
     :vartype N: integer
     :ivar all_knees: A set containing all the x values of the identified knee points.
@@ -139,6 +143,7 @@ class KneeLocator(object):
         interp_method: str = "interp1d",
         online: bool = False,
         polynomial_degree: int = 7,
+        piecewise_params: Tuple[float, float, float] = [0.5, 0, 1.0],
     ):
         # Step 0: Raw Input
         self.x = np.array(x)
@@ -153,6 +158,7 @@ class KneeLocator(object):
         self.all_norm_knees_y = []
         self.online = online
         self.polynomial_degree = polynomial_degree
+        self.piecewise_params = piecewise_params
 
         # I'm implementing Look Before You Leap (LBYL) validation for direction
         # and curve arguments. This is not preferred in Python. The motivation
@@ -177,7 +183,8 @@ class KneeLocator(object):
         elif interp_method == "piecewise":
             def piecewise_linear(x, x0, y0, m):
                 return np.piecewise(x, [x < x0, x >= x0], [lambda x: y0, lambda x: m * (x - x0) + y0])
-            params, _ = curve_fit(piecewise_linear, self.x, self.y, p0=[100, 0.95, -0.001])
+            #self.piecewise_params = (np.mean(self.x), np.max(self.y), (np.min(self.y) - np.max(self.y)) / (np.max(self.x) - np.mean(self.x)) )
+            params, _ = curve_fit(piecewise_linear, self.x, self.y, self.piecewise_params)
             self.Ds_y = piecewise_linear(self.x, *params)
         else:
             raise ValueError(
