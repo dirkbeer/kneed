@@ -177,7 +177,8 @@ class KneeLocator(object):
         elif interp_method == "piecewise":
             def piecewise_linear(x, x0, y0, m):
                 return np.piecewise(x, [x < x0, x >= x0], [lambda x: y0, lambda x: m * (x - x0) + y0])
-            p = curve_fit(piecewise_linear, x, y, p0=[1, 1, -1])
+            p = curve_fit(piecewise_linear, self.x, self.y, p0=[1, 1, -1])
+            self.Ds_y = p(x)
         else:
             raise ValueError(
                 "{} is an invalid interp_method parameter, use either 'interp1d' or 'polynomial'".format(
