@@ -159,6 +159,7 @@ class KneeLocator(object):
         self.online = online
         self.polynomial_degree = polynomial_degree
         self.piecewise_params = piecewise_params
+        self.fitted_params = None
 
         # I'm implementing Look Before You Leap (LBYL) validation for direction
         # and curve arguments. This is not preferred in Python. The motivation
@@ -184,8 +185,8 @@ class KneeLocator(object):
             def piecewise_linear(x, x0, y0, m):
                 return np.piecewise(x, [x < x0, x >= x0], [lambda x: y0, lambda x: m * (x - x0) + y0])
             #self.piecewise_params = (np.mean(self.x), np.max(self.y), (np.min(self.y) - np.max(self.y)) / (np.max(self.x) - np.mean(self.x)) )
-            params, _ = curve_fit(piecewise_linear, self.x, self.y, self.piecewise_params)
-            self.Ds_y = piecewise_linear(self.x, *params)
+            self.fitted_params, _ = curve_fit(piecewise_linear, self.x, self.y, self.piecewise_params)
+            self.Ds_y = piecewise_linear(self.x, *self.fitted_params)
         else:
             raise ValueError(
                 "{} is an invalid interp_method parameter, use either 'interp1d', 'polynomial', or 'piecewise'".format(
